@@ -64,7 +64,6 @@ module.exports = function(grunt) {
           runtimePath:'soyPython',
         }
       }
-      
     },
 
     copy: {
