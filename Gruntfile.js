@@ -40,7 +40,7 @@ module.exports = function(grunt) {
     },
 
     closureSoys: {
-      all: {
+      js: {
         src: ['templates', 'soy', '**', '*.soy'].join('/'),
         soyToJsJarPath: [process.env.HOME, 'bin', 'google_closure_templates',
                          'SoyToJsSrcCompiler.jar'].join('/'),
@@ -53,7 +53,18 @@ module.exports = function(grunt) {
           // goog.provide and goog.require statements are added.
           shouldProvideRequireSoyNamespaces: false
         }
+      },
+      py: {
+         src: ['templates', 'soy', '**', '*.soy'].join('/'),
+        soyToJsJarPath: [process.env.HOME, 'bin', 'google_closure_templates',
+                         'SoyToPySrcCompiler.jar'].join('/'),
+        outputPathFormat: [targetDirectory, 'generated', '{INPUT_FILE_NAME_NO_EXT}.py'].join('/'),
+        options: {
+          // This points to the package - targetDirectory/generated/soyPython
+          runtimePath:'soyPython',
+        }
       }
+      
     },
 
     copy: {
@@ -68,6 +79,12 @@ module.exports = function(grunt) {
         dest: [targetDirectory, 'static', ''].join('/'),
         expand: true,
         src: 'soyutils.js'
+      },
+       soy_python: {
+        cwd: [process.env.HOME, 'bin', 'google_closure_templates','closure-templates','python'].join('/'),
+        dest: [targetDirectory,'generated','soyPython',''].join('/'),
+        expand: true,
+        src: '**'
       },
       static: {
         cwd: 'static',
@@ -151,7 +168,8 @@ module.exports = function(grunt) {
   grunt.registerTask('default',
       ['copy:source', 'copy:static', 'copy:templates',
        'copy:third_party_js', 'copy:third_party_py',
-      grunt.config.get('build.use_closure_templates') ? 'closureSoys' : 'nop',
+      grunt.config.get('build.use_closure_templates') ? 'closureSoys:js' : 'nop',
+      grunt.config.get('build.use_closure_py_templates') ? 'closureSoys:py' : 'nop',
       grunt.config.get('build.use_closure_templates') ? 'copy:soyutils' : 'nop',
       grunt.config.get('build.use_closure') ? 'closureBuilder' : 'nop',
       'yaml']);
